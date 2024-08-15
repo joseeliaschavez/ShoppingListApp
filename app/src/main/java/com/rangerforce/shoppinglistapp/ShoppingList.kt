@@ -93,11 +93,7 @@ fun ShoppingListApp(modifier: Modifier = Modifier) {
                         )
                     } else {
                         shoppingItemList = shoppingItemList.map {
-                            if (it.id == editingItem!!.id) {
-                                it.copy(name = name, quantity = quantity)
-                            } else {
-                                it
-                            }
+                            if (it.id == editingItem!!.id) it.copy(name = name, quantity = quantity) else it
                         }
                         editingItem = null
                     }
@@ -115,7 +111,7 @@ fun ShoppingListItem(
     modifier: Modifier = Modifier
 ) {
     Row(
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxSize()
             .padding(4.dp)
