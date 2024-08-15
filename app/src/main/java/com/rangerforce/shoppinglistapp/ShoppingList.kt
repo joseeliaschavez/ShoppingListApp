@@ -43,6 +43,7 @@ fun ShoppingListApp(modifier: Modifier = Modifier) {
     var idCounter by remember { mutableIntStateOf(0) }
     var shoppingItemList by remember { mutableStateOf(listOf<ShoppingListItem>()) }
     var showDialog by remember { mutableStateOf(false) }
+    var editingItem by remember { mutableStateOf<ShoppingListItem?>(null) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -53,7 +54,12 @@ fun ShoppingListApp(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(16.dp)
         )
-        Button(onClick = { showDialog = true }) {
+        Button(
+            onClick = {
+                editingItem = null
+                showDialog = true
+            }
+        ) {
             Text("Add Item")
         }
         LazyColumn(
@@ -65,21 +71,36 @@ fun ShoppingListApp(modifier: Modifier = Modifier) {
             items(items = shoppingItemList, key = { item -> item.id }) { item ->
                 ShoppingListItem(
                     item = item,
-                    onEdit = {},
+                    onEdit = {
+                        editingItem = item
+                        showDialog = true
+                    },
                     onDelete = {}
                 )
             }
         }
         if (showDialog) {
             AddItemDialog(
+                item = editingItem,
                 onDismiss = { showDialog = false },
                 onConfirm = { name, quantity ->
-                    shoppingItemList = shoppingItemList + ShoppingListItem(
-                        id = idCounter++,
-                        name = name,
-                        quantity = quantity,
-                        editing = false
-                    )
+                    if (editingItem == null) {
+                        shoppingItemList = shoppingItemList + ShoppingListItem(
+                            id = idCounter++,
+                            name = name,
+                            quantity = quantity,
+                            editing = false
+                        )
+                    } else {
+                        shoppingItemList = shoppingItemList.map {
+                            if (it.id == editingItem!!.id) {
+                                it.copy(name = name, quantity = quantity)
+                            } else {
+                                it
+                            }
+                        }
+                        editingItem = null
+                    }
                 }
             )
         }
@@ -131,11 +152,12 @@ fun ShoppingListItem(
 
 @Composable
 fun AddItemDialog(
+    item: ShoppingListItem? = null,
     onDismiss: () -> Unit,
     onConfirm: (String, Int) -> Unit
 ) {
-    var itemName by remember { mutableStateOf("") }
-    var itemQuantity by remember { mutableStateOf("") }
+    var itemName by remember { mutableStateOf(item?.name ?: "") }
+    var itemQuantity by remember { mutableStateOf(item?.quantity?.toString() ?: "") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
