@@ -1,11 +1,20 @@
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -52,8 +61,8 @@ fun ShoppingListApp(modifier: Modifier = Modifier) {
                 .padding(16.dp)
                 .weight(1f)
         ) {
-            items(shoppingItemList) {
-                Text("Item $it")
+            items(items = shoppingItemList, key = { item -> item.id }) { item ->
+                ShoppingListItem(item = item, onEdit = {}, onDelete = {})
             }
         }
         if (showDialog) {
@@ -68,6 +77,43 @@ fun ShoppingListApp(modifier: Modifier = Modifier) {
                     )
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun ShoppingListItem(
+    item: ShoppingListItem,
+    onEdit: (Int) -> Unit,
+    onDelete: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxSize()
+            .padding(4.dp)
+            .border(
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                shape = MaterialTheme.shapes.medium)
+    ) {
+        Text(text = item.name,
+            modifier = modifier.weight(4f)
+                .padding(8.dp))
+        Text(text = "Qty: ${item.quantity}",
+            modifier = modifier.weight(2f)
+                .padding(8.dp))
+        IconButton(onClick = { onEdit(item.id) },
+            modifier = modifier.weight(1f)
+                .padding(8.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+        }
+        IconButton(onClick = { onDelete(item.id) },
+            modifier = modifier.weight(1f)
+                .padding(8.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
         }
     }
 }
@@ -102,6 +148,7 @@ fun AddItemDialog(
         },
         confirmButton = {
             Button(onClick = {
+                if (itemName.isEmpty()) return@Button // ensures that the return statement exits the onClick lambda for the Button composable, rather than the enclosing function
                 val quantity = itemQuantity.toIntOrNull() ?: 0
                 onConfirm(itemName, quantity)
                 onDismiss()
