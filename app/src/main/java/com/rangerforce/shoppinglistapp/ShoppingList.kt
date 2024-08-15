@@ -51,7 +51,8 @@ fun ShoppingListApp(modifier: Modifier = Modifier) {
         Text(
             text = "Shopping List",
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp))
+            modifier = Modifier.padding(16.dp)
+        )
         Button(onClick = { showDialog = true }) {
             Text("Add Item")
         }
@@ -62,7 +63,11 @@ fun ShoppingListApp(modifier: Modifier = Modifier) {
                 .weight(1f)
         ) {
             items(items = shoppingItemList, key = { item -> item.id }) { item ->
-                ShoppingListItem(item = item, onEdit = {}, onDelete = {})
+                ShoppingListItem(
+                    item = item,
+                    onEdit = {},
+                    onDelete = {}
+                )
             }
         }
         if (showDialog) {
@@ -97,19 +102,25 @@ fun ShoppingListItem(
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
                 shape = MaterialTheme.shapes.medium)
     ) {
-        Text(text = item.name,
+        Text(
+            text = item.name,
             modifier = modifier.weight(4f)
-                .padding(8.dp))
-        Text(text = "Qty: ${item.quantity}",
+                .padding(8.dp)
+        )
+        Text(
+            text = "Qty: ${item.quantity}",
             modifier = modifier.weight(2f)
-                .padding(8.dp))
-        IconButton(onClick = { onEdit(item.id) },
+                .padding(8.dp)
+        )
+        IconButton(
+            onClick = { onEdit(item.id) },
             modifier = modifier.weight(1f)
                 .padding(8.dp)
         ) {
             Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
         }
-        IconButton(onClick = { onDelete(item.id) },
+        IconButton(
+            onClick = { onDelete(item.id) },
             modifier = modifier.weight(1f)
                 .padding(8.dp)
         ) {
